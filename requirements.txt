@@ -1,0 +1,8 @@
+flwr>=1.14
+torch
+torchvision
+numpy
+matplotlib
+prettytable
+su
+ray
