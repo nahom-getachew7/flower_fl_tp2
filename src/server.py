@@ -5,7 +5,7 @@ from typing import Optional, Dict, List, Tuple
 import json
 from flwr.server.strategy import Strategy
 from flwr.server.client_manager import ClientManager
-from .strategy import FedAvgStrategy
+from .strategy import FedAvgStrategy, FedProxStrategy
 from .client_manager import CustomClientManager
 
 def convert_metrics(metrics: Dict[str, List[tuple[int, float]]]) -> List[tuple[int, Dict[str, float]]]:
@@ -45,7 +45,7 @@ def run_server(
     config = fl.server.ServerConfig(num_rounds=num_rounds)
 
     if strategy is None:
-        strategy = FedAvgStrategy()
+        strategy = FedProxStrategy()
     if client_manager is None:
         client_manager = CustomClientManager()
 

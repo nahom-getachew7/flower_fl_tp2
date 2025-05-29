@@ -42,11 +42,25 @@ class CustomClient(Client):
         parameters = parameters_to_ndarrays(ins.parameters)
         self.model.set_model_parameters(parameters)
         
+        # Extract mu from config (default to 0 for FedAvg)
+        mu = ins.config.get("mu", 0.0)
+        
+        # Save global parameters BEFORE training (convert to numpy)
+        global_params = self.model.get_model_parameters()
+        
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01)
+        optimizer = torch.optim.Adam(
+            self.model.parameters(), 
+            lr=ins.config.get("learning_rate", 0.01)
+        )
         
         loss, accuracy = self.model.train_epoch(
-            self.train_loader, criterion, optimizer, self.device
+            self.train_loader,
+            criterion,
+            optimizer,
+            self.device,
+            global_params=global_params,  # Pass global params
+            mu=mu                       # Pass mu
         )
         
         parameters = self.model.get_model_parameters()

@@ -1,7 +1,7 @@
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from torch.utils.data import DataLoader
 import torch
 
@@ -34,18 +34,36 @@ class CustomFashionModel(nn.Module):
         train_loader: DataLoader,
         criterion: nn.Module,
         optimizer: torch.optim.Optimizer,
-        device: torch.device
+        device: torch.device,
+        global_params: Optional[List[np.ndarray]] = None,  # New param
+        mu: float = 0.0                                    # New param
     ) -> Tuple[float, float]:
         self.train()
         total_loss = 0.0
         correct = 0
         total = 0
         
+        # Convert global params to tensors if provided
+        global_tensors = None
+        if global_params is not None and mu > 0:
+            global_tensors = [
+                torch.tensor(arr).to(device) 
+                for arr in global_params
+            ]
+        
         for data, target in train_loader:
             data, target = data.to(device), target.to(device)
             optimizer.zero_grad()
             output = self(data)
             loss = criterion(output, target)
+            
+            # Add proximal term if mu > 0
+            if mu > 0 and global_tensors is not None:
+                proximal_term = 0.0
+                for param, global_t in zip(self.parameters(), global_tensors):
+                    proximal_term += torch.norm(param - global_t, p=2) ** 2
+                loss = loss + (mu / 2) * proximal_term
+            
             loss.backward()
             optimizer.step()
             

@@ -4,6 +4,7 @@ from src.data_utils import generate_distributed_datasets
 from src.server import run_server
 from src.visualizer import ResultsVisualizer
 from src.run_client import run_client
+from src.strategy import FedAvgStrategy, FedProxStrategy  # Add FedProxStrategy
 
 def main():
     
@@ -21,6 +22,9 @@ def main():
     server_parser.add_argument("--address", type=str, default="127.0.0.1:8080")
     server_parser.add_argument("--rounds", type=int, default=3)
     server_parser.add_argument("--output", type=str, default="results.json")
+    # Add new arguments for strategy and mu
+    server_parser.add_argument("--strategy", type=str, choices=["fedavg", "fedprox"], default="fedavg")
+    server_parser.add_argument("--mu", type=float, default=0.1, help="Proximal term coefficient (only for FedProx)")
     
     # Client 
     client_parser = subparsers.add_parser("run-client")
@@ -46,8 +50,18 @@ def main():
         print(f"Generated datasets for {args.num_clients} clients")
 
     elif args.command == "run-server":
+        # Create the appropriate strategy
+        if args.strategy == "fedavg":
+            strategy = FedAvgStrategy()
+        elif args.strategy == "fedprox":
+            strategy = FedProxStrategy(mu=args.mu)
         
-        run_server(args.address, args.rounds,output_file=args.output)
+        run_server(
+            server_address=args.address,
+            num_rounds=args.rounds,
+            strategy=strategy,
+            output_file=args.output
+        )
 
     elif args.command == "run-client":
         run_client(args.cid)
