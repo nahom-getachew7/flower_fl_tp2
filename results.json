@@ -1,0 +1,61 @@
+{
+  "losses_distributed": [
+    [
+      1,
+      1.9417583048571911
+    ],
+    [
+      2,
+      0.47928171180510115
+    ],
+    [
+      3,
+      0.42236942065014715
+    ]
+  ],
+  "metrics_distributed": [
+    [
+      1,
+      {
+        "num_examples": 3917.0
+      }
+    ],
+    [
+      2,
+      {
+        "num_examples": 3917.0
+      }
+    ],
+    [
+      3,
+      {
+        "num_examples": 3917.0
+      }
+    ]
+  ],
+  "metrics_distributed_fit": [
+    [
+      1,
+      {
+        "train_loss": 1.1393472851091795,
+        "train_accuracy": 0.610130904951622
+      }
+    ],
+    [
+      2,
+      {
+        "train_loss": 0.7136168201390195,
+        "train_accuracy": 0.7466164453524005
+      }
+    ],
+    [
+      3,
+      {
+        "train_loss": 0.597809132008063,
+        "train_accuracy": 0.7779622063329928
+      }
+    ]
+  ],
+  "losses_centralized": [],
+  "metrics_centralized": []
+}
