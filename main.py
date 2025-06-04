@@ -1,9 +1,10 @@
 import argparse
-from os import name
 from src.data_utils import generate_distributed_datasets
-from src.server import run_server
+from src.server import run_server, run_simulation
 from src.visualizer import ResultsVisualizer
-from src.run_client import run_client
+from src.run_client import client_fn, run_client  # Import client_fn for simulation
+from src.strategy import ScaffoldStrategy  # Import your custom strategy
+import flwr as fl
 from torch import manual_seed
 from numpy.random import seed as np_seed
 
@@ -45,6 +46,12 @@ def main():
     simvis_parser.add_argument("--rounds", type=int, default=3)
     simvis_parser.add_argument("--results-file", type=str, default="results.json")
     simvis_parser.add_argument("--output-dir", type=str, default="./figures")
+
+    # New: Simulation command
+    sim_parser = subparsers.add_parser("simulate")
+    sim_parser.add_argument("--num-clients", type=int, default=10)
+    sim_parser.add_argument("--rounds", type=int, default=3)
+    sim_parser.add_argument("--output", type=str, default="results.json")
     
     args = parser.parse_args()
     
@@ -58,6 +65,9 @@ def main():
 
     elif args.command == "run-client":
         run_client(args.cid)
+
+    elif args.command == "simulate":
+        run_simulation(args.num_clients, args.rounds, args.output)
 
     elif args.command == "visualize":
         visualizer = ResultsVisualizer()

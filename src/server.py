@@ -7,6 +7,8 @@ from flwr.server.strategy import Strategy
 from flwr.server.client_manager import ClientManager
 from .strategy import ScaffoldStrategy
 from .client_manager import CustomClientManager
+from .run_client import client_fn
+from .strategy import ScaffoldStrategy
 
 def convert_metrics(metrics: Dict[str, List[tuple[int, float]]]) -> List[tuple[int, Dict[str, float]]]:
    
@@ -60,4 +62,21 @@ def run_server(
     
     save_results(history, output_file)
 
+    return history
+
+def run_simulation(
+    num_clients: int,
+    num_rounds: int,
+    output_file: str = "results.json",
+) -> History:
+    """Run a Flower simulation with SCAFFOLD."""
+
+    history = fl.simulation.start_simulation(
+        client_fn=client_fn,
+        num_clients=num_clients,
+        config=fl.server.ServerConfig(num_rounds=num_rounds),
+        client_resources={"num_cpus": 2, "num_gpus": 0.0},
+        strategy=ScaffoldStrategy(),
+    )
+    save_results(history, output_file)
     return history

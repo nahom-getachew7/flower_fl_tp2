@@ -183,25 +183,37 @@ class ScaffoldStrategy(Strategy):
 
     def aggregate_evaluate(
         self,
-        server_round: int,
+        server_round: int,  # Add this
         results: List[Tuple[ClientProxy, EvaluateRes]],
-        failures: List[Tuple[ClientProxy, EvaluateRes]],
+        failures: List[Tuple[ClientProxy, EvaluateRes]],  # Add this
     ) -> Tuple[Optional[float], Dict[str, Scalar]]:
-        """Aggregate evaluation results."""
+        """Aggregate evaluation accuracy and loss across clients."""
         if not results:
             return None, {}
 
-        # Sum weighted loss over clients
+        # Aggregate losses
+        total_loss = 0.0
         total_examples = 0
-        sum_loss = 0.0
-        for _, eval_res in results:
-            total_examples += eval_res.num_examples
-            if eval_res.loss is not None:
-                sum_loss += eval_res.loss * eval_res.num_examples
+        for client_proxy, evaluate_res in results:
+            if evaluate_res.loss is not None:
+                total_loss += evaluate_res.loss * evaluate_res.num_examples
+                total_examples += evaluate_res.num_examples
 
-        # Compute averaged loss
-        averaged_loss = sum_loss / total_examples if total_examples > 0 else None
-        return averaged_loss, {"num_examples": total_examples}
+        # Aggregate metrics (including val_accuracy)
+        metrics_aggregated = {}
+        if total_examples > 0:
+            metrics_aggregated["val_loss"] = total_loss / total_examples
+
+            # Calculate weighted average of val_accuracy
+            val_accuracies = [r.metrics.get("val_accuracy", 0) * r.num_examples 
+                            for _, r in results if "val_accuracy" in r.metrics]
+            total_val_examples = sum(r.num_examples for _, r in results 
+                                if "val_accuracy" in r.metrics)
+            
+            if total_val_examples > 0:
+                metrics_aggregated["val_accuracy"] = sum(val_accuracies) / total_val_examples
+
+        return total_loss / total_examples if total_examples > 0 else None, metrics_aggregated
     
     def evaluate(self, server_round: int, parameters: Parameters) -> Optional[Tuple[float, Dict[str, Scalar]]]:
         return None
