@@ -11,7 +11,7 @@ class ScaffoldStrategy(Strategy):
 
     def __init__(
         self,
-        fraction_fit: float = 1.0,
+        fraction_fit: float = 0.5,
         fraction_evaluate: float = 1.0,
         min_fit_clients: int = 0,
         min_evaluate_clients: int = 0,
