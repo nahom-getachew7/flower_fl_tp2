@@ -4,10 +4,17 @@ from src.data_utils import generate_distributed_datasets
 from src.server import run_server
 from src.visualizer import ResultsVisualizer
 from src.run_client import run_client
+from torch import manual_seed
+from numpy.random import seed as np_seed
+
+def set_seed(seed: int = 42) -> None:
+    """Set all random seeds for reproducibility."""
+    manual_seed(seed)          # PyTorch
+    np_seed(seed)              # NumPy
 
 def main():
-    
-    parser = argparse.ArgumentParser(description="Federated Learning TP1")
+    set_seed(42)
+    parser = argparse.ArgumentParser(description="Federated Learning TP2")
     subparsers = parser.add_subparsers(dest="command", required=True)
     
     #Generate data

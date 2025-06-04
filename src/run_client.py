@@ -5,6 +5,8 @@ from .client import CustomClient
 import torch
 import flwr as fl
 
+BATCH_SIZE = 64
+
 def run_client(cid: int) -> None:
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -13,7 +15,7 @@ def run_client(cid: int) -> None:
     train_loader, val_loader = load_client_data(
         cid=cid,
         data_dir="./data/client_data",
-        batch_size=32
+        batch_size=BATCH_SIZE
     )
     
    
