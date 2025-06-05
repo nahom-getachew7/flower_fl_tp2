@@ -5,28 +5,37 @@ from flwr.common import (
     Scalar
 )
 from flwr.server.client_proxy import ClientProxy
-from flwr.server.client_manager import ClientManager
 from typing import List, Tuple, Dict, Optional, Union
 import numpy as np
 import time
+from flwr.server.client_manager import ClientManager 
 
-class FedAvgStrategy(Strategy):
-    def __init__(self, initial_parameters: Optional[Parameters] = None):
+class FedProxStrategy(Strategy):
+    def __init__(
+        self, 
+        initial_parameters: Optional[Parameters] = None,
+        mu: float = 0.1,  # Proximal term coefficient
+        fraction_fit: float = 0.5,
+        fraction_evaluate: float = 1.0
+    ):
         self.initial_parameters = initial_parameters
+        self.mu = mu
+        self.fraction_fit = fraction_fit
+        self.fraction_evaluate = fraction_evaluate
 
     def initialize_parameters(self, client_manager: ClientManager) -> Optional[Parameters]:
         print("Waiting for clients to connect...")
-        timeout = 300  # Increased timeout to 5 minutes
+        timeout = 300
         start_time = time.time()
         
         while client_manager.num_available() < 1:
             elapsed = time.time() - start_time
             if elapsed > timeout:
-                raise RuntimeError(f"Timeout after {timeout} seconds: No clients connected to server.")
-            print(f"Waiting... ({elapsed:.1f}s elapsed, {client_manager.num_available()} clients connected)")
-            time.sleep(5)  # Check every 5 seconds instead of 1
+                raise RuntimeError(f"Timeout after {timeout} seconds")
+            print(f"Waiting... ({elapsed:.1f}s elapsed)")
+            time.sleep(5)
             
-        print(f"Client connected! Proceeding with initialization.")
+        print("Client connected! Proceeding with initialization.")
         return self.initial_parameters
 
     def configure_fit(
@@ -35,25 +44,21 @@ class FedAvgStrategy(Strategy):
         parameters: Parameters,
         client_manager: ClientManager
     ) -> List[Tuple[ClientProxy, FitIns]]:
-       
+        # Sample clients
+        num_clients = client_manager.num_available()
+        num_sample = max(1, int(self.fraction_fit * num_clients))
+        clients = client_manager.sample(num_clients=num_sample, min_num_clients=1)
         
-        sample_size = max(1, int(0.3 * client_manager.num_available()))
-        clients = client_manager.sample(
-            num_clients=sample_size,
-            min_num_clients=1,  
-            criterion=None  
-        )
-        
-        
+        # Configure fit instructions
         config = {
             "server_round": server_round,
-            "epochs": 3,  
-            "batch_size": 64,  
-            "learning_rate": 0.01  
+            "epochs": 3,
+            "batch_size": 64,
+            "learning_rate": 0.01,
+            "mu": self.mu  # Pass proximal coefficient
         }
         
         fit_ins = FitIns(parameters=parameters, config=config)
-        
         return [(client, fit_ins) for client in clients]
 
     def aggregate_fit(
@@ -93,20 +98,13 @@ class FedAvgStrategy(Strategy):
         parameters: Parameters,
         client_manager: ClientManager
     ) -> List[Tuple[ClientProxy, EvaluateIns]]:
+        num_clients = client_manager.num_available()
+        num_sample = max(1, int(self.fraction_evaluate * num_clients))
+        clients = client_manager.sample(num_clients=num_sample, min_num_clients=1)
         
-        
-        eval_clients = client_manager.sample(
-            num_clients=max(2, int(0.2 * client_manager.num_available())),
-            min_num_clients=1
-        )
-        
-        config = {
-            "server_round": server_round,
-            "batch_size": 32  
-        }
-        
-        evaluate_ins = EvaluateIns(parameters=parameters, config=config)
-        return [(client, evaluate_ins) for client in eval_clients]
+        evaluate_ins = EvaluateIns(parameters=parameters, config={})
+        return [(client, evaluate_ins) for client in clients]
+
     def aggregate_evaluate(
         self,
         server_round: int,
@@ -119,42 +117,16 @@ class FedAvgStrategy(Strategy):
         total_examples = sum([res.num_examples for _, res in results])
         weighted_loss = sum([res.loss * res.num_examples for _, res in results]) / total_examples
         avg_accuracy = np.mean([res.metrics["val_accuracy"] for _, res in results])
+        avg_loss = np.mean([res.metrics["val_loss"] for _, res in results])
 
         return float(weighted_loss), {
-            "val_accuracy": float(avg_accuracy)
+            "val_accuracy": float(avg_accuracy),
+            "val_loss": float(avg_loss)
         }
     def evaluate(
-        self, server_round: int, parameters: Parameters
-    ) -> Optional[Tuple[float, Dict[str, Scalar]]]:
-       
+    self,
+    server_round: int,
+    parameters: Parameters
+) -> Optional[Tuple[float, Dict[str, Scalar]]]:
+    # Optional: implement centralized evaluation here if needed
         return None
-    
-    
-class FedProxStrategy(FedAvgStrategy):
-    def __init__(
-        self, 
-        initial_parameters: Optional[Parameters] = None,
-        mu: float = 0.1  # Proximal term coefficient
-    ):
-        super().__init__(initial_parameters)
-        self.mu = mu
-
-    def configure_fit(
-        self,
-        server_round: int,
-        parameters: Parameters,
-        client_manager: ClientManager
-    ) -> List[Tuple[ClientProxy, FitIns]]:
-        clients = super().configure_fit(server_round, parameters, client_manager)
-        
-        # Add mu to config for all clients
-        return [
-            (
-                client,
-                FitIns(
-                    parameters=fit_ins.parameters,
-                    config={**fit_ins.config, "mu": self.mu}
-                )
-            )
-            for client, fit_ins in clients
-        ]

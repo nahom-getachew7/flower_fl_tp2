@@ -1,11 +1,10 @@
 import flwr as fl
-from flwr.server import Server
 from flwr.server.history import History
 from typing import Optional, Dict, List, Tuple
 import json
 from flwr.server.strategy import Strategy
 from flwr.server.client_manager import ClientManager
-from .strategy import FedAvgStrategy, FedProxStrategy
+from .strategy import FedProxStrategy  # Only FedProx
 from .client_manager import CustomClientManager
 
 def convert_metrics(metrics: Dict[str, List[tuple[int, float]]]) -> List[tuple[int, Dict[str, float]]]:
@@ -38,14 +37,14 @@ def run_server(
     num_rounds: int = 3,
     strategy: Optional[Strategy] = None,
     client_manager: Optional[ClientManager] = None,
-    output_file: str = "results.json"
+    output_file: str = "results.json",
+    mu: float = 0.1  # Add mu parameter
 ) -> History:
-    
-    
     config = fl.server.ServerConfig(num_rounds=num_rounds)
 
     if strategy is None:
-        strategy = FedProxStrategy()
+        strategy = FedProxStrategy(mu=mu)  # Default to FedProx
+    
     if client_manager is None:
         client_manager = CustomClientManager()
 
@@ -56,8 +55,30 @@ def run_server(
         strategy=strategy,
         client_manager=client_manager
     )
-
     
     save_results(history, output_file)
+    return history
 
+# Add simulation function
+def run_simulation(
+    num_clients: int,
+    num_rounds: int,
+    output_file: str = "results.json",
+    mu: float = 0.1
+) -> History:
+    """Run FedProx simulation"""
+    from .run_client import client_fn
+    import flwr as fl
+    
+    strategy = FedProxStrategy(mu=mu)
+    
+    history = fl.simulation.start_simulation(
+        client_fn=client_fn,
+        num_clients=num_clients,
+        config=fl.server.ServerConfig(num_rounds=num_rounds),
+        client_resources={"num_cpus": 2, "num_gpus": 0.0},
+        strategy=strategy,
+    )
+    
+    save_results(history, output_file)
     return history

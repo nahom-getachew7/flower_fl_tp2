@@ -86,7 +86,7 @@ class CustomClient(Client):
             status=Status(code=Code.OK, message="Success"),
             loss=float(loss),
             num_examples=len(self.test_loader.dataset),
-            metrics={"val_accuracy": accuracy}
+            metrics={"val_loss": loss, "val_accuracy": accuracy}
         )
 
     def to_client(self) -> 'CustomClient':
