@@ -19,53 +19,45 @@ def compare_multiple_results(file_label_map: Dict[str, str], fig_dir: str = "./C
     for file_path, label in file_label_map.items():
         all_results[label] = load_results(file_path)
 
+    # Create a figure with two subplots (one for accuracy, one for loss)
+    plt.figure(figsize=(16, 6))
     
-    plt.figure(figsize=(8, 5))
+    # Subplot 1: Validation Accuracy
+    plt.subplot(1, 2, 1)
     for label, data in all_results.items():
-        rounds = [r[0] for r in data.get("losses_distributed", [])]
-        losses = [r[1] for r in data.get("losses_distributed", [])]
-        plt.plot(rounds, losses,label=f"Loss - {label}")
-    plt.title("Loss per Round (Comparison)")
+        rounds = [r[0] for r in data.get("metrics_distributed", [])]
+        val_acc = [r[1].get("val_accuracy", 0.0) for r in data.get("metrics_distributed", [])]
+        plt.plot(rounds, val_acc, label=f"{label}")
+    
+    plt.title("Validation Accuracy Comparison")
+    plt.xlabel("Round")
+    plt.ylabel("Accuracy")
+    plt.legend()
+    plt.grid(True)
+    
+    # Subplot 2: Validation Loss
+    plt.subplot(1, 2, 2)
+    for label, data in all_results.items():
+        rounds = [r[0] for r in data.get("metrics_distributed", [])]
+        val_loss = [r[1].get("val_loss", 0.0) for r in data.get("metrics_distributed", [])]
+        plt.plot(rounds, val_loss, label=f"{label}")
+    
+    plt.title("Validation Loss Comparison")
     plt.xlabel("Round")
     plt.ylabel("Loss")
     plt.legend()
     plt.grid(True)
-    plt.savefig(os.path.join(fig_dir, "loss_comparision.png"))
-    plt.close()
-
-   
-    plt.figure(figsize=(8, 5))
-    for label, data in all_results.items():
-        rounds = [r[0] for r in data.get("metrics_distributed", [])]
-        val_acc = [r[1].get("val_accuracy", 0.0) for r in data.get("metrics_distributed", [])]
-        plt.plot(rounds, val_acc, label=f"Val Acc - {label}")
-    plt.title("Validation Accuracy per Round (Comparison)")
-    plt.xlabel("Round")
-    plt.ylabel("Accuracy")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(fig_dir, "val_accuracy_comparision.png"))
-    plt.close()
-
     
-    plt.figure(figsize=(8, 5))
-    for label, data in all_results.items():
-        rounds = [r[0] for r in data.get("metrics_distributed_fit", [])]
-        train_acc = [r[1].get("train_accuracy", 0.0) for r in data.get("metrics_distributed_fit", [])]
-        plt.plot(rounds, train_acc, label=f"Train Acc - {label}")
-    plt.title("Training Accuracy per Round (Comparison)")
-    plt.xlabel("Round")
-    plt.ylabel("Accuracy")
-    plt.legend()
-    plt.grid(True)
-    plt.savefig(os.path.join(fig_dir, "Train_accuracy_comparision.png"))
+    plt.tight_layout()
+    plt.savefig(os.path.join(fig_dir, "alpha_comparison.png"))
     plt.close()
 
 
 if __name__ == "__main__":
     file_label_map = {
-        "round30epoch5.json": "alpha= 1.0",
-        "round30epoch5_alpha4.json": "alpha= 4.0"
+        "results_alpha_10.json": "α=10.0",
+        "results_alpha_1.json": "α=1.0",
+        "results_alpha_01.json": "α=0.1"
     }
 
     compare_multiple_results(file_label_map)
