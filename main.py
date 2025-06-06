@@ -1,7 +1,6 @@
 import argparse
 from src.data_utils import generate_distributed_datasets
 from src.server import run_server, run_simulation
-from src.visualizer import ResultsVisualizer
 from src.run_client import client_fn, run_client  # Import client_fn for simulation
 from src.strategy import ScaffoldStrategy  # Import your custom strategy
 import flwr as fl
