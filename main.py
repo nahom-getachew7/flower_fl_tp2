@@ -2,7 +2,6 @@ import argparse
 from os import name
 from src.data_utils import generate_distributed_datasets
 from src.server import run_server
-from src.visualizer import ResultsVisualizer
 from src.run_client import run_client
 
 def main():
@@ -27,18 +26,6 @@ def main():
     client_parser.add_argument("--cid", type=int, required=True, help="Client ID (0 to num-clients-1)")
     
     
-    # Visualization 
-    vis_parser = subparsers.add_parser("visualize")
-    vis_parser.add_argument("--results-file", type=str, default="results.json")
-    vis_parser.add_argument("--output-dir", type=str, default="./figures")
-
-    # Simulation + Visualization command (NEW)
-    simvis_parser = subparsers.add_parser("simulate-and-visualize")
-    simvis_parser.add_argument("--num-clients", type=int, default=2)
-    simvis_parser.add_argument("--rounds", type=int, default=3)
-    simvis_parser.add_argument("--results-file", type=str, default="results.json")
-    simvis_parser.add_argument("--output-dir", type=str, default="./figures")
-    
     args = parser.parse_args()
     
     if args.command == "generate-data":
@@ -51,11 +38,6 @@ def main():
 
     elif args.command == "run-client":
         run_client(args.cid)
-
-    elif args.command == "visualize":
-        visualizer = ResultsVisualizer()
-        visualizer.load_simulation_results(args.results_file)
-        visualizer.plot_results(args.output_dir)
 
 if __name__ == "__main__":
     main()
