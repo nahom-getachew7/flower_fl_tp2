@@ -11,8 +11,12 @@ import numpy as np
 import time
 
 class FedAvgStrategy(Strategy):
-    def __init__(self, initial_parameters: Optional[Parameters] = None):
+    def __init__(self, initial_parameters: Optional[Parameters] = None,
+                 fraction_fit: float = 0.5,
+                 fraction_evaluate: float = 1.0):
         self.initial_parameters = initial_parameters
+        self.fraction_fit = fraction_fit
+        self.fraction_evaluate = fraction_evaluate
 
     def initialize_parameters(self, client_manager: ClientManager) -> Optional[Parameters]:
         print("Waiting ...")
@@ -34,7 +38,8 @@ class FedAvgStrategy(Strategy):
     ) -> List[Tuple[ClientProxy, FitIns]]:
        
         
-        sample_size = max(1, int(0.3 * client_manager.num_available()))
+        num_clie = client_manager.num_available()
+        sample_size = max(1, int(self.fraction_fit * num_clie))
         clients = client_manager.sample(
             num_clients=sample_size,
             min_num_clients=1,  
@@ -91,18 +96,12 @@ class FedAvgStrategy(Strategy):
         client_manager: ClientManager
     ) -> List[Tuple[ClientProxy, EvaluateIns]]:
         
+        num_clie = client_manager.num_available()
+        num_sample = max(1, int(self.fraction_evaluate * num_clie))
+        eval_clients = client_manager.sample(num_clients=num_sample, min_num_clients=1)
+
         
-        eval_clients = client_manager.sample(
-            num_clients=max(2, int(0.2 * client_manager.num_available())),
-            min_num_clients=1
-        )
-        
-        config = {
-            "server_round": server_round,
-            "batch_size": 32  
-        }
-        
-        evaluate_ins = EvaluateIns(parameters=parameters, config=config)
+        evaluate_ins = EvaluateIns(parameters=parameters, config={})
         return [(client, evaluate_ins) for client in eval_clients]
     def aggregate_evaluate(
         self,
@@ -113,11 +112,13 @@ class FedAvgStrategy(Strategy):
         if not results:
             return None, {}
 
+        
         total_examples = sum([res.num_examples for _, res in results])
         weighted_loss = sum([res.loss * res.num_examples for _, res in results]) / total_examples
         avg_accuracy = np.mean([res.metrics["val_accuracy"] for _, res in results])
 
         return float(weighted_loss), {
+            "val_loss": float(weighted_loss),
             "val_accuracy": float(avg_accuracy)
         }
     def evaluate(
