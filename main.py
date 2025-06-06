@@ -25,10 +25,6 @@ def main():
     client_parser = subparsers.add_parser("run-client")
     client_parser.add_argument("--cid", type=int, required=True)
     
-    # Visualization
-    vis_parser = subparsers.add_parser("visualize")
-    vis_parser.add_argument("--results-file", type=str, default="results.json")
-    vis_parser.add_argument("--output-dir", type=str, default="./figures")
     
     # NEW: Simulation command
     sim_parser = subparsers.add_parser("simulate")
@@ -60,11 +56,6 @@ def main():
             args.output,
             args.mu
         )
-    
-    elif args.command == "visualize":
-        visualizer = ResultsVisualizer()
-        visualizer.load_simulation_results(args.results_file)
-        visualizer.plot_results(args.output_dir)
 
 if __name__ == "__main__":
     main()
