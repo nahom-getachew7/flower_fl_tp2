@@ -37,9 +37,9 @@ This branch is focused **only on comparing** the three strategies. It contains:
 
 - **`comparison_figures/`**  
   Training & validation accuracy graphs for each strategy at each α level:
-  - [`comparison_figures/alpha_10/`](comparison_figures/alpha_10/)
-  - [`comparison_figures/alpha_1/`](comparison_figures/alpha_1/)
-  - [`comparison_figures/alpha_0.1/`](comparison_figures/alpha_0.1/)
+  - [`comparison_figures/alpha_10/`](Comparison_figures/alpha_10/)
+  - [`comparison_figures/alpha_1/`](Comparison_figures/alpha_1/)
+  - [`comparison_figures/alpha_0.1/`](Comparison_figures/alpha_0.1/)
 
 ---
 
