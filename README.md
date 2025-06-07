@@ -1,71 +1,59 @@
-# Federated Learning Strategies Comparison
+# Federated Learning Strategy Comparison (FedAvg vs FedProx vs SCAFFOLD)
 
-![Comparison Example](Comparison_figures/alpha_1/train_val_accuracy_comparison.png)
+This repository compares three Federated Learning strategies — **FedAvg**, **FedProx**, and **SCAFFOLD** — under varying degrees of data heterogeneity (α ∈ {10, 1, 0.1}) using a non-IID Dirichlet data partitioning.
 
-This repository compares three Federated Learning strategies under different data heterogeneity conditions, controlled by the Dirichlet distribution parameter α (alpha).
+## 🌍 General Concept
 
-## Table of Contents
-1. [Project Overview](#project-overview)
-2. [Branches Description](#branches-description)
-3. [Non-IID Data Challenges](#non-iid-data-challenges)
-4. [Strategies Comparison](#strategies-comparison)
-5. [Results Analysis](#results-analysis)
-6. [Conclusion](#conclusion)
+### Why Federated Learning Struggles with Non-IID Data
 
-## Project Overview
+In real-world FL scenarios, each client may hold data from different distributions. This is known as **non-IID** data. The Dirichlet distribution with parameter **α** is used to simulate such heterogeneity:
 
-This project evaluates three FL algorithms:
-- **FedAvg** (Baseline)
-- **FedProx** (Proximal Regularization)
-- **SCAFFOLD** (Control Variates)
+- **α = 10**: Low heterogeneity (close to IID)
+- **α = 1**: Moderate heterogeneity
+- **α = 0.1**: High heterogeneity
 
-Tested under three data heterogeneity levels (α=10, 1, 0.1) on FashionMNIST dataset.
+With non-IID data, **client drift** becomes a major issue, leading to poor convergence and unstable training in basic strategies like FedAvg.
 
-Key metrics tracked:
-- Training Accuracy
-- Validation Accuracy 
-- Convergence Speed
-- Training Stability
+### Optimization Motivations
 
-## Branches Description
+- **FedAvg** performs poorly under non-IID conditions due to client drift.
+- **FedProx** introduces a proximal term to reduce local model divergence.
+- **SCAFFOLD** applies control variates to align local updates to the global objective, reducing variance.
 
-| Branch | Description |
-|--------|-------------|
-| [`main`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/main) | Comparison analysis and results |
-| [`FedAvg`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedAvg)| Baseline implementation |
-| [`FedProx`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedProx) | Proximal term implementation |
-| [`SCAFFOLD`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/SCAFFOLD) | Control variates implementation |
+---
 
-## Non-IID Data Challenges
+## 🧪 What's in the `main` Branch?
 
-### The Problem with FedAvg
-FedAvg suffers from **client drift** in non-IID settings because:
-- Local updates diverge from global objective
-- High variance in client updates
-- Slower convergence
-- Reduced final accuracy
+This branch is focused **only on comparing** the three strategies. It contains:
 
-### Why Optimization is Needed
-As α decreases (more heterogeneity):
-- Client models specialize in local data
-- Global model suffers from update conflicts
-- Standard FedAvg becomes unstable
+- **`src/`**  
+  Source code for comparing FedAvg, FedProx, and SCAFFOLD at α = 10, 1, 0.1.
 
-## Strategies Comparison
+- **`results/`**  
+  JSON training history files from simulations done in the three corresponding branches:
+  - [`FedAvg`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedAvg)
+  - [`FedProx`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedProx)
+  - [`SCAFFOLD`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/SCAFFOLD)
 
-### FedProx (μ=0.1)
-- Adds proximal term to local loss
-- Penalizes deviation from global model
-- Formula: `L = L_standard + (μ/2) * ||w - w_global||²`
+- **`comparison_figures/`**  
+  Training & validation accuracy graphs for each strategy at each α level:
+  - [`comparison_figures/alpha_10/`](comparison_figures/alpha_10/)
+  - [`comparison_figures/alpha_1/`](comparison_figures/alpha_1/)
+  - [`comparison_figures/alpha_0.1/`](comparison_figures/alpha_0.1/)
 
-### SCAFFOLD
-- Uses control variates (c, c_k)
-- Corrects local gradient updates
-- Maintains server and client state
+---
 
-## Results Analysis
+## 🔁 Contents of Other Branches
 
-### Performance Comparison (Final Round)
+- **[`FedAvg`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedAvg)**: Baseline FL algorithm using simple model averaging.
+- **[`FedProx`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedProx)**: Introduces a proximal term to reduce divergence.
+- **[`SCAFFOLD`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/SCAFFOLD)**: Uses control variates to reduce update variance.
+
+---
+
+## 📊 Comparison of Strategies
+
+### Results Summary Table
 
 | Strategy | α=10 (IID-like) | α=1 (Moderate) | α=0.1 (High) |
 |----------|----------------|----------------|--------------|
@@ -73,29 +61,43 @@ As α decreases (more heterogeneity):
 | FedProx  | 91.8%          | 88.7%          | 80.4%        |
 | SCAFFOLD | 92.0%          | 90.2%          | 86.5%        |
 
-### Key Observations:
+
+### Visual Analysis
+#### Key Observations:
 1. **α=10 (Low Heterogeneity)**
    - All strategies perform similarly
    - FedAvg sufficient for IID-like data
-   ![α=10 Comparison](Comparison_figures/alpha_10/train_val_accuracy_comparison.png)
+   ![α=10 Comparison](comparison_figures/alpha_10/train_val_accuracy_comparison.png)
 
 2. **α=1 (Moderate Heterogeneity)**
    - FedProx shows 3.4% improvement over FedAvg
    - SCAFFOLD shows 4.9% improvement
-   ![α=1 Comparison](Comparison_figures/alpha_1/train_val_accuracy_comparison.png)
+   ![α=1 Comparison](comparison_figures/alpha_1/train_val_accuracy_comparison.png)
 
 3. **α=0.1 (High Heterogeneity)**
    - FedProx maintains stability (+7.6%)
    - SCAFFOLD excels (+13.7%)
-   ![α=0.1 Comparison](Comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
+   ![α=0.1 Comparison](comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
 
-## Conclusion
+---
 
-- **FedAvg** works well for IID data but degrades with heterogeneity
-- **FedProx** provides consistent improvements (2-8%) across all α values
-- **SCAFFOLD** shows strongest performance in extreme non-IID (α=0.1)
+## 🔍 Reflections
 
-Recommendation:
-- Use FedAvg for IID-like settings (α≥10)
-- FedProx for moderate heterogeneity (1≤α<10)
-- SCAFFOLD for highly non-IID data (α<1)
+- **FedAvg** suffers most in highly heterogeneous setups (α = 0.1), confirming client drift issues.
+- **FedProx** performs better in all settings by regularizing local updates.
+- **SCAFFOLD** consistently outperforms others, especially under strong non-IID data, due to its variance reduction mechanism.
+
+---
+
+## ✅ Conclusion
+
+This experiment demonstrates how **data heterogeneity** drastically affects Federated Learning. While **FedAvg** serves as a simple baseline, more robust algorithms like **FedProx** and **SCAFFOLD** significantly improve convergence and accuracy — particularly in **non-IID** settings. Among all, **SCAFFOLD** proves to be the most reliable in both convergence speed and accuracy under all α levels.
+
+---
+
+📂 This README is for the **`main` branch**. Visit the strategy-specific branches for implementation details:
+
+- [FedAvg Branch](../../tree/FedAvg)
+- [FedProx Branch](../../tree/FedProx)
+- [SCAFFOLD Branch](../../tree/SCAFFOLD)
+
