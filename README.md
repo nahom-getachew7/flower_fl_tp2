@@ -29,12 +29,12 @@ Key metrics tracked:
 
 ## Branches Description
 
-| Branch | Description | Link |
-|--------|-------------|------|
-| `main` | Comparison analysis and results | [main branch](https://github.com/nahom-getachew7/flower_fl_tp2/tree/main) |
-| `FedAvg` | Baseline implementation | [FedAvg branch](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedAvg) |
-| `FedProx` | Proximal term implementation | [FedProx branch](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedProx) |
-| `SCAFFOLD` | Control variates implementation | [SCAFFOLD branch](https://github.com/nahom-getachew7/flower_fl_tp2/tree/SCAFFOLD) |
+| Branch | Description |
+|--------|-------------|
+| [`main`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/main) | Comparison analysis and results |
+| [`FedAvg`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedAvg)| Baseline implementation |
+| [`FedProx`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedProx) | Proximal term implementation |
+| [`SCAFFOLD`](https://github.com/nahom-getachew7/flower_fl_tp2/tree/SCAFFOLD) | Control variates implementation |
 
 ## Non-IID Data Challenges
 
