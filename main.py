@@ -1,7 +1,6 @@
 import argparse
 from src.data_utils import generate_distributed_datasets
 from src.server import run_server, run_simulation  # Add simulation
-from src.visualizer import ResultsVisualizer
 from src.run_client import run_client, client_fn  # Add client_fn
 
 def main():
