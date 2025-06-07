@@ -67,17 +67,17 @@ This branch is focused **only on comparing** the three strategies. It contains:
 1. **α=10 (Low Heterogeneity)**
    - All strategies perform similarly
    - FedAvg sufficient for IID-like data
-   ![α=10 Comparison](comparison_figures/alpha_10/train_val_accuracy_comparison.png)
+   ![α=10 Comparison](Comparison_figures/alpha_10/train_val_accuracy_comparison.png)
 
 2. **α=1 (Moderate Heterogeneity)**
    - FedProx shows 3.4% improvement over FedAvg
    - SCAFFOLD shows 4.9% improvement
-   ![α=1 Comparison](comparison_figures/alpha_1/train_val_accuracy_comparison.png)
+   ![α=1 Comparison](Comparison_figures/alpha_1/train_val_accuracy_comparison.png)
 
 3. **α=0.1 (High Heterogeneity)**
    - FedProx maintains stability (+7.6%)
    - SCAFFOLD excels (+13.7%)
-   ![α=0.1 Comparison](comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
+   ![α=0.1 Comparison](Comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
 
 ---
 
@@ -97,7 +97,7 @@ This experiment demonstrates how **data heterogeneity** drastically affects Fede
 
 📂 This README is for the **`main` branch**. Visit the strategy-specific branches for implementation details:
 
-- [FedAvg Branch](../../tree/FedAvg)
-- [FedProx Branch](../../tree/FedProx)
-- [SCAFFOLD Branch](../../tree/SCAFFOLD)
+- [FedAvg Branch](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedAvg)
+- [FedProx Branch](https://github.com/nahom-getachew7/flower_fl_tp2/tree/FedProx)
+- [SCAFFOLD Branch](https://github.com/nahom-getachew7/flower_fl_tp2/tree/SCAFFOLD)
 
