@@ -1,6 +1,6 @@
 # Federated Learning Strategies Comparison
 
-![Comparison Example](comparison_figures/alpha_1/train_val_accuracy_comparison.png)
+![Comparison Example](Comparison_figures/alpha_1/train_val_accuracy_comparison.png)
 
 This repository compares three Federated Learning strategies under different data heterogeneity conditions, controlled by the Dirichlet distribution parameter α (alpha).
 
@@ -77,17 +77,17 @@ As α decreases (more heterogeneity):
 1. **α=10 (Low Heterogeneity)**
    - All strategies perform similarly
    - FedAvg sufficient for IID-like data
-   ![α=10 Comparison](comparison_figures/alpha_10/train_val_accuracy_comparison.png)
+   ![α=10 Comparison](Comparison_figures/alpha_10/train_val_accuracy_comparison.png)
 
 2. **α=1 (Moderate Heterogeneity)**
    - FedProx shows 3.4% improvement over FedAvg
    - SCAFFOLD shows 4.9% improvement
-   ![α=1 Comparison](comparison_figures/alpha_1/train_val_accuracy_comparison.png)
+   ![α=1 Comparison](Comparison_figures/alpha_1/train_val_accuracy_comparison.png)
 
 3. **α=0.1 (High Heterogeneity)**
    - FedProx maintains stability (+7.6%)
    - SCAFFOLD excels (+13.7%)
-   ![α=0.1 Comparison](comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
+   ![α=0.1 Comparison](Comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
 
 ## Conclusion
 
