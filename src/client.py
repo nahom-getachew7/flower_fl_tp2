@@ -49,7 +49,7 @@ class CustomClient(Client):
         global_params = self.model.get_model_parameters()
         
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(
+        optimizer = torch.optim.SGD(
             self.model.parameters(), 
             lr=ins.config.get("learning_rate", 0.01)
         )
