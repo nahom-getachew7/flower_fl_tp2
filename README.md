@@ -57,9 +57,9 @@ This branch is focused **only on comparing** the three strategies. It contains:
 Based on validation accuracy
 | Strategy | α=10 (IID-like) | α=1 (Moderate) | α=0.1 (High) |
 |----------|----------------|----------------|--------------|
-| FedAvg   | 92.1%          | 85.3%          | 72.8%        |
-| FedProx(mu = 0.1)  | 74%          | 82%          | 92%        |
-| SCAFFOLD | 90.0%          | 94%          | 94.7%        |
+| FedAvg   | 0.86          | 0.81         | 0.71       |
+| FedProx(mu = 0.1)  | 0.84          | 0.81          | 0.61        |
+| SCAFFOLD | 0.85          | 0.83         | O.76       |
 
 Note that I used mu = 0.1 for FedProx for the comparison between the three strategies because in Branch FedProx we can notice that this value(0.1) give a better result compared to the other values(0.5 and 1.0).
 
