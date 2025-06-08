@@ -48,6 +48,7 @@ def compare_multiple_results(file_label_map: Dict[str, str], fig_dir: str = "./C
     plt.close()
 
 if __name__ == "__main__":
+    print("This is compare_train_val_accuracy")
     file_label_map = {
         "results_alpha_10.json": "α=10.0",
         "results_alpha_1.json": "α=1.0",

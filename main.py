@@ -4,16 +4,9 @@ from src.server import run_server, run_simulation
 from src.run_client import client_fn, run_client  # Import client_fn for simulation
 from src.strategy import ScaffoldStrategy  # Import your custom strategy
 import flwr as fl
-from torch import manual_seed
-from numpy.random import seed as np_seed
-
-def set_seed(seed: int = 42) -> None:
-    """Set all random seeds for reproducibility."""
-    manual_seed(seed)          # PyTorch
-    np_seed(seed)              # NumPy
+       # NumPy
 
 def main():
-    set_seed(42)
     parser = argparse.ArgumentParser(description="Federated Learning TP2")
     subparsers = parser.add_subparsers(dest="command", required=True)
     

@@ -65,7 +65,7 @@ class CustomClient(Client):
 
         # Train model with per-batch gradient correction
         criterion = nn.CrossEntropyLoss()
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.01)
+        optimizer = torch.optim.SGD(self.model.parameters(), lr=0.01)
         
         self.model.train()
         total_loss, correct, total = 0.0, 0, 0
