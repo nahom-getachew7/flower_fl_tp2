@@ -28,6 +28,10 @@ class FedAvgStrategy(Strategy):
                 raise RuntimeError("Timeout: No clients connected to server.")
                 time.sleep(1)
                 print(f"{client_manager.num_available()} clients connected. Proceeding with initialization.")
+                
+                if self.initial_parameters is None:
+                    model = CustomFashionModel()
+                    self.initial_parameters = ndarrays_to_parameters(model.get_model_parameters())
         return self.initial_parameters
 
     def configure_fit(
