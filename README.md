@@ -58,41 +58,64 @@ Based on validation accuracy
 | Strategy | α=10 (IID-like) | α=1 (Moderate) | α=0.1 (High) |
 |----------|----------------|----------------|--------------|
 | FedAvg   | 0.86          | 0.81         | 0.71       |
-| FedProx(mu = 0.1)  | 0.84          | 0.81          | 0.61        |
-| SCAFFOLD | 0.85          | 0.83         | O.76       |
+| FedProx(mu = 0.1)  | 0.84          | 0.81          | 0.80        |
+| SCAFFOLD | 0.85          | 0.83         | O.81       |
 
 Note that I used mu = 0.1 for FedProx for the comparison between the three strategies because in Branch FedProx we can notice that this value(0.1) give a better result compared to the other values(0.5 and 1.0).
 
-### Visual Analysis
-#### Key Observations:
-1. **α=10 (Low Heterogeneity)**
-   - All strategies perform similarly
-   - FedAvg sufficient for IID-like data
-   ![α=10 Comparison](Comparison_figures/alpha_10/train_val_accuracy_comparison.png)
+## 📉 Visual Analysis and Observations
 
-2. **α=1 (Moderate Heterogeneity)**
-   - FedProx shows 3.4% improvement over FedAvg
-   - SCAFFOLD shows 4.9% improvement
-   ![α=1 Comparison](Comparison_figures/alpha_1/train_val_accuracy_comparison.png)
+### α = 10 (Low Heterogeneity)
 
-3. **α=0.1 (High Heterogeneity)**
-   - FedProx maintains stability (+7.6%)
-   - SCAFFOLD excels (+13.7%)
-   ![α=0.1 Comparison](Comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
+![α=10 Comparison](Comparison_figures/alpha_10/train_val_accuracy_comparison.png)
+
+- FedAvg and SCAFFOLD perform almost similarly due to the near-IID nature of client data.
+- SCAFFOLD shows more stable convergence.
+- FedProx is relatively unstabel and lower performance.
+
+### α = 1 (Moderate Heterogeneity)
+
+![α=1 Comparison](Comparison_figures/alpha_1/train_val_accuracy_comparison.png)
+
+- FedAvg starts to show degradation due to client drift.
+- The same for SCAFFOLD but there is unstability here too.
+- FedProx again lower performance and great unstability.
+
+### α = 0.1 (High Heterogeneity)
+
+![α=0.1 Comparison](Comparison_figures/alpha_0.1/train_val_accuracy_comparison.png)
+
+- FedAvg suffers significantly, validating its sensitivity to non-IID data.
+- FedProx shows better improvement, but convergence is **slower**—this might explain why it underperforms in some early-stage experiments.
+- SCAFFOLD again delivers the best stability and final accuracy due to its variance reduction mechanism.
 
 ---
 
-## 🔍 Reflections
+## ⚠️ Limitations & Constraints
 
-- **FedAvg** suffers most in highly heterogeneous setups (α = 0.1), confirming client drift issues.
-- **FedProx** performs better in all settings by regularizing local updates.
-- **SCAFFOLD** consistently outperforms others, especially under strong non-IID data, due to its variance reduction mechanism.
+- **Training Time & Resources**: Training on all α values, especially under high heterogeneity, required significant time and machine capacity.  
+  Due to these constraints:
+  - The main results are derived using **Flower simulation**. It mimics real distributed settings while running faster on a single machine.
+  - Real-world distributed implementations were also tested and **executed correctly**.  
+    These results are available via additional **`.json` logs** included in each strategy’s branch.
+
+- **FedProx Convergence**:  
+  FedProx tends to **converge slower**, especially when μ is small.  
+  The 50 communication rounds might not be sufficient for it to reach its full potential. More rounds may yield better results.
+
+- **Hyperparameter Sensitivity**:  
+  The choice of μ in FedProx is crucial. While μ = 0.1 gave better results relatively to the others, the optimal value might lie between 0.1 and 0.5 depending on the dataset and heterogeneity level. Further fine-tuning is needed.
 
 ---
 
 ## ✅ Conclusion
 
-This experiment demonstrates how **data heterogeneity** drastically affects Federated Learning. While **FedAvg** serves as a simple baseline, more robust algorithms like **FedProx** and **SCAFFOLD** significantly improve convergence and accuracy — particularly in **non-IID** settings. Among all, **SCAFFOLD** proves to be the most reliable in both convergence speed and accuracy under all α levels.
+This project shows that **data heterogeneity has a major impact** on federated learning performance:
+
+- **FedAvg** is efficient in IID or near-IID scenarios but fails under strong heterogeneity.
+- **FedProx** helps in stabilizing training in heterogeneous cases, though it may need more rounds and better-tuned μ values.
+- **SCAFFOLD** consistently outperforms others, especially in highly non-IID setups, due to its correction mechanism for client drift.
+
 
 ---
 
